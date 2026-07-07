@@ -29,7 +29,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mikefsq/optec-astro/focuslynx"
+	"github.com/mikefsq/optec/focuslynx"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/mikefsq/optec-astro
+module github.com/mikefsq/optec
 
 go 1.25.0
 
