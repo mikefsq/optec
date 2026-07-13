@@ -1,6 +1,6 @@
 module github.com/mikefsq/optec
 
-go 1.23
+go 1.25.0
 
 require go.bug.st/serial v1.7.1
 
