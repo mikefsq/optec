@@ -49,15 +49,8 @@ func OpenPort(port string) (*Hub, error) {
 func (h *Hub) Info() DeviceInfo { return h.info }
 func (h *Hub) Close() error     { return h.t.Close() }
 
-// OpenByNickname opens the hub whose focuser nickname matches nick (case-insensitive,
-// trimmed) and returns it with the matched channel (1 or 2). It scans every attached
-// FocusLynx/ThirdLynx port and asks each channel its nickname over the protocol — a
-// platform-independent identity that needs no OS USB-descriptor access and, because
-// only a real FocusLynx answers HELLO, also disambiguates among several FTDI devices
-// sharing one VID/PID. Non-matching hubs are closed.
-//
-// Unlike a factory serial the nickname is user-assigned (set it once per unit with
-// Focuser.SetNickname); the factory default is not guaranteed unique.
+// OpenByNickname finds a trimmed, case-insensitive nickname and returns its hub and channel.
+// Nonmatching hubs are closed. User-assigned nicknames should be unique.
 func OpenByNickname(nick string) (*Hub, int, error) {
 	want := strings.TrimSpace(strings.ToLower(nick))
 	if want == "" {
@@ -183,11 +176,7 @@ func (h *Hub) Query(cmd string) (map[string]string, error) {
 	}
 }
 
-// Action sends cmd and returns the controller's status keyword. Every command is
-// answered by an immediate "!" ack followed by a one-word status line — "M"
-// (moving), "H" (homing), "HALTED", "STOPPED", or "SET" (config saved). That
-// keyword is consumed here so it can't bleed into the next reply; most callers
-// discard it, but Say Hello reads its nickname from it.
+// Action consumes the acknowledgement and returns the following status keyword or error.
 func (h *Hub) Action(cmd string) (string, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()

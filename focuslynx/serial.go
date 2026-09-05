@@ -33,11 +33,7 @@ func openPort(dev string, baud int) (Transport, DeviceInfo, error) {
 	return port, DeviceInfo{Port: dev, Baud: baud}, nil
 }
 
-// Enumerate lists attached FocusLynx (FTDI 0x0403 → 115200) and ThirdLynx
-// (Microchip 0x04D8 & 0xED77 → 19200) ports, each tagged with its baud. Matching is
-// per-OS: enum_other.go uses USB VID/PID via the pure-Go enumerator; enum_darwin.go
-// matches the device-name convention, deliberately avoiding the enumerator's macOS
-// cgo (IOKit) path so the driver builds for any target with CGO_ENABLED=0.
+// Enumerate lists candidate FocusLynx and ThirdLynx ports with their baud rates.
 func Enumerate() ([]DeviceInfo, error) { return enumeratePorts() }
 
 func openFirst() (Transport, DeviceInfo, error) {

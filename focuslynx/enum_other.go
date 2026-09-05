@@ -18,9 +18,7 @@ const (
 	pidThirdLynx = "ED77" // ThirdLynx product ID
 )
 
-// enumeratePorts lists FocusLynx/ThirdLynx ports via go.bug.st/serial's enumerator,
-// which is pure Go on every non-darwin OS and reports USB VID/PID, tagging each with
-// its variant baud.
+// enumeratePorts finds candidate serial ports by USB identifiers.
 func enumeratePorts() ([]DeviceInfo, error) {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {

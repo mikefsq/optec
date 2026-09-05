@@ -1,24 +1,4 @@
-// Command flprobe exercises the pure-Go Optec FocusLynx / ThirdLynx driver against a
-// real device: it opens a hub (by port, nickname, or first found), dumps the decoded
-// read surface, and can move or validate the config-write surface.
-//
-//	flprobe                          # read-only: identity, status, config
-//	flprobe -list                    # list candidate serial ports
-//	flprobe -port /dev/cu.usbmodem101
-//	flprobe -nickname "QuickSync FTX40"   # open by protocol nickname (scans ports)
-//	flprobe -ch 2                    # operate on channel F2 (FocusLynx)
-//	flprobe -moveto 12000            # absolute move, then watch it settle
-//	flprobe -in 200  / -out 200      # relative move by N steps (in=−, out=+)
-//	flprobe -reltest                 # continuous MoveOut+EndRelative, report Δ
-//	flprobe -stoptest 30000          # MoveTo far, run ~1s, Halt mid-flight
-//	flprobe -home / -center / -stop  # home / center-of-travel / halt
-//	flprobe -sync 1500               # set reported position without moving (SCCP)
-//	flprobe -setnick "OAG focuser"   # set channel nickname, read back
-//	flprobe -led 50                  # set hub LED brightness, read back
-//	flprobe -backlashsteps 40        # set backlash steps, read back
-//	flprobe -tempcomp on             # enable/disable temp compensation, read back
-//	flprobe -cfgtest                 # safe round-trip of every config setter (reverted)
-//	flprobe -watch                   # poll position+moving repeatedly
+// Command flprobe reads device status and provides diagnostic controls.
 package main
 
 import (
@@ -230,10 +210,7 @@ func dumpAll(hub *focuslynx.Hub, fc *focuslynx.Focuser) {
 	}
 }
 
-// runCfgTest validates every config setter with a safe round-trip: read the original
-// value, change it, confirm the readback, then restore the original. Every change is
-// reverted; nothing is left modified. Device type is only re-set to its CURRENT value
-// (a real change can damage the focuser), and FactoryReset is never issued.
+// runCfgTest changes settings, checks readback, and attempts to restore their original values.
 func runCfgTest(hub *focuslynx.Hub, fc *focuslynx.Focuser) {
 	fmt.Println("\n-- config round-trip validation (all changes reverted) --")
 

@@ -9,12 +9,7 @@ import (
 	bugst "go.bug.st/serial"
 )
 
-// enumeratePorts lists FocusLynx/ThirdLynx ports on macOS by the device-name
-// convention: FTDI (FocusLynx) → /dev/cu.usbserial-* @115200; Microchip CDC
-// (ThirdLynx) → /dev/cu.usbmodem* @19200. Reading the USB VID on macOS would
-// require the enumerator's cgo (IOKit) path, which has no CGO_ENABLED=0 fallback and
-// so would break cross-compilation to darwin; GetPortsList is pure Go, so discovery
-// here is name-based.
+// enumeratePorts finds candidate serial ports by macOS device names, without cgo.
 func enumeratePorts() ([]DeviceInfo, error) {
 	names, err := bugst.GetPortsList()
 	if err != nil {

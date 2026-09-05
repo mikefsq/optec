@@ -1,10 +1,5 @@
-# Built probe binaries
+cmd/flprobe/flprobe
 /flprobe
-*.exe
-
-# Go test / coverage artifacts
 *.test
 *.out
-
-# OS / editor cruft
 .DS_Store
