@@ -320,3 +320,32 @@ func TestConcurrentAccess(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+// The identification test openFirst relies on: only a real FocusLynx answers HELLO.
+//
+// FTDI's VID 0403 is a generic USB-serial bridge shared by mounts, meters and focusers, so a rig
+// commonly carries several. Binding on the VID alone takes whichever the OS enumerated first,
+// holds its port against the driver that owns it, and speaks a protocol it does not understand.
+// OpenByNickname already scanned this way and documented why; openFirst now does too.
+func TestSpeaksFocusLynx(t *testing.T) {
+	t.Run("a real hub answers HELLO", func(t *testing.T) {
+		f := &fakeHub{maxStep: 112000}
+		if !speaksFocusLynx(New(f, DeviceInfo{Port: "/dev/ttyUSB0", Baud: baudFocusLynx})) {
+			t.Error("speaksFocusLynx = false for a hub that answers HELLO")
+		}
+	})
+	t.Run("a silent device is not a hub", func(t *testing.T) {
+		// mute answers nothing, like another instrument's FTDI bridge would.
+		if speaksFocusLynx(New(&muteTransport{}, DeviceInfo{Port: "/dev/ttyUSB1", Baud: baudFocusLynx})) {
+			t.Error("speaksFocusLynx = true for a device that never replies")
+		}
+	})
+}
+
+// muteTransport accepts writes and never replies — a stand-in for a neighbouring FTDI device that
+// does not speak this protocol.
+type muteTransport struct{}
+
+func (muteTransport) Write(b []byte) (int, error) { return len(b), nil }
+func (muteTransport) Read(p []byte) (int, error)  { time.Sleep(10 * time.Millisecond); return 0, nil }
+func (muteTransport) Close() error                { return nil }
